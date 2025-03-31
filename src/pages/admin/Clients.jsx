@@ -69,6 +69,9 @@ const Clients = () => {
         return;
       }
 
+      // Store admin user info
+      const adminUid = currentAdmin.uid;
+
       // Check if user already exists in Firestore
       const usersRef = collection(db, 'users');
       const q = query(usersRef, where('email', '==', formData.email));
@@ -95,7 +98,7 @@ const Clients = () => {
         uid: userCredential.user.uid
       });
 
-      // Force a reload of the current user to maintain admin session
+      // Force reload the admin user to maintain admin session
       await auth.currentUser.reload();
       
       // Reload the clients list from Firestore
