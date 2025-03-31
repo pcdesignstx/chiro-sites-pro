@@ -60,6 +60,7 @@ const Clients = () => {
 
   const handleAddClient = async (e) => {
     e.preventDefault();
+    // Test comment: This function handles the creation of new clients while maintaining admin session
     try {
       const auth = getAuth();
       const currentAdmin = auth.currentUser;
