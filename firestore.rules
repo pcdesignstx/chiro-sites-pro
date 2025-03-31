@@ -1,0 +1,159 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner'
+      );
+    }
+
+    function isClient() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'client';
+    }
+
+    // User document rules
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow write: if isAuthenticated() && isAdmin();
+      allow list: if isAuthenticated() && isAdmin();
+      
+      // Settings subcollection rules
+      match /settings/{document=**} {
+        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+      }
+      
+      // Elements subcollection rules
+      match /elements/{document=**} {
+        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+      }
+      
+      // Pages subcollection rules
+      match /pages/{document=**} {
+        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+      }
+      
+      // Blog subcollection rules
+      match /blog/{document=**} {
+        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+      }
+      
+      // Landing pages subcollection rules
+      match /landingPages/{document=**} {
+        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+      }
+    }
+
+    // Requests collection rules
+    match /requests/{requestId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.clientId || isAdmin()
+      );
+      allow write: if isAuthenticated() && isAdmin();
+      allow list: if isAuthenticated() && isAdmin();
+    }
+
+    // Client Requests collection rules
+    match /clientRequests/{requestId} {
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.clientId || isAdmin()
+      );
+      allow update, delete: if isAdmin();
+      allow list: if isAdmin();
+    }
+
+    // Organizations collection rules
+    match /organizations/{orgId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Legacy collections - allow read/write for authenticated users and admins
+    match /websiteIdentity/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /websiteDesign/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /elements/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /pages/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    // Legacy root-level documents and collections
+    match /home {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /about {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /services {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /contact {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /blog {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /landingPages {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    // Legacy collections with documents
+    match /home/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /about/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /services/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /contact/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /blog/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    match /landingPages/{document=**} {
+      allow read, write: if isAuthenticated() && (isAdmin() || isClient());
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+} 

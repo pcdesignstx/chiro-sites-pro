@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.youtube.com https://*.googleapis.com https://apis.google.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:;
+      img-src 'self' data: https: blob: https://*.ytimg.com;
+      connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net https://*.firebaseapp.com https://firestore.googleapis.com wss://*.firebaseio.com https://*.firebasestorage.googleapis.com;
+      frame-src 'self' https://*.youtube.com https://www.youtube.com;
+      media-src 'self' http://localhost:* https://*.googleapis.com;
+      worker-src 'self' blob:;
+      script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://*.youtube.com https://*.googleapis.com https://apis.google.com
+    ">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Amatic+SC:wght@700&family=Barlow+Condensed:wght@400;500&family=Barlow:wght@400;500&family=Clicker+Script&family=Crimson+Pro:wght@400;500&family=Josefin+Sans:wght@400;500&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500&family=Montserrat:wght@400;500&family=Open+Sans:wght@400;500&family=Oswald:wght@400;500&family=Playfair+Display:wght@400;500&family=Raleway:wght@400;500&family=Roboto+Slab:wght@400;500&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <title>ChiroSites Pro</title>
+  </head>
+  <body class="m-0 p-0">
+    <div id="root" class="w-full min-h-screen"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
