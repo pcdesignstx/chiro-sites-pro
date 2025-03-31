@@ -98,7 +98,9 @@ const Clients = () => {
       // Force a reload of the current user to maintain admin session
       await auth.currentUser.reload();
       
-      setClients(prev => [...prev, { id: userCredential.user.uid, ...formData }]);
+      // Reload the clients list from Firestore
+      await loadClients();
+      
       setShowAddModal(false);
       setFormData({ name: '', email: '', clinicName: '', phone: '', status: 'active', password: '' });
 
