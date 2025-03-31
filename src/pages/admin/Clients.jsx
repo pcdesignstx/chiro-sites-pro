@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { db } from '../../firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, query, where } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { deleteClientCompletely } from '../../utils/userManagement';
 
 const Clients = () => {
@@ -60,7 +60,6 @@ const Clients = () => {
 
   const handleAddClient = async (e) => {
     e.preventDefault();
-    // Test comment: This function handles the creation of new clients while maintaining admin session
     try {
       const auth = getAuth();
       const currentAdmin = auth.currentUser;
@@ -69,9 +68,6 @@ const Clients = () => {
         setError('Admin authentication required');
         return;
       }
-
-      // Store admin user info
-      const adminUid = currentAdmin.uid;
 
       // Check if user already exists in Firestore
       const usersRef = collection(db, 'users');
@@ -83,25 +79,16 @@ const Clients = () => {
         return;
       }
 
-      // Create auth user
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password || 'defaultPassword123'
-      );
-
-      // Create Firestore document
-      await setDoc(doc(db, 'users', userCredential.user.uid), {
+      // Create Firestore document only (temporarily removing Auth user creation)
+      const newUserRef = doc(collection(db, 'users'));
+      await setDoc(newUserRef, {
         ...formData,
         role: 'client',
         createdAt: new Date(),
         status: 'active',
-        uid: userCredential.user.uid
+        uid: newUserRef.id
       });
 
-      // Force reload the admin user to maintain admin session
-      await auth.currentUser.reload();
-      
       // Reload the clients list from Firestore
       await loadClients();
       
@@ -116,11 +103,7 @@ const Clients = () => {
       setTimeout(() => successMessage.remove(), 3000);
     } catch (error) {
       console.error('Error adding client:', error);
-      if (error.code === 'auth/email-already-in-use') {
-        setError('A user with this email already exists');
-      } else {
-        setError('Failed to add client. Please try again.');
-      }
+      setError('Failed to add client. Please try again.');
     }
   };
 
