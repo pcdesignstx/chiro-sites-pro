@@ -3,6 +3,7 @@ import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { db } from '../../firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, query, where } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { deleteClientCompletely } from '../../utils/userManagement';
 
 const Clients = () => {
   const [clients, setClients] = useState([]);
@@ -112,8 +113,7 @@ const Clients = () => {
   const handleDeleteClient = async (clientId) => {
     if (window.confirm('Are you sure you want to delete this client? This action cannot be undone.')) {
       try {
-        // Delete from Firestore
-        await deleteDoc(doc(db, 'users', clientId));
+        await deleteClientCompletely(clientId);
         
         // Update UI
         setClients(prev => prev.filter(client => client.id !== clientId));
@@ -124,9 +124,6 @@ const Clients = () => {
         successMessage.textContent = 'Client deleted successfully';
         document.body.appendChild(successMessage);
         setTimeout(() => successMessage.remove(), 3000);
-
-        // Note: Firebase Auth deletion requires Admin SDK which should be implemented server-side
-        console.log('Note: Firebase Auth user deletion should be implemented server-side in production');
       } catch (error) {
         console.error('Error deleting client:', error);
         setError('Failed to delete client. Please try again.');

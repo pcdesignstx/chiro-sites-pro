@@ -1,5 +1,8 @@
 import { db } from "../firebase";
-import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc, deleteDoc } from "firebase/firestore";
+import { deleteUser } from 'firebase/auth';
+import { auth } from '../firebase';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 // Call this function after user signs up or logs in
 export const createOrUpdateUser = async (userAuth, role = "client") => {
@@ -129,4 +132,22 @@ export const updateUserName = async (uid, name) => {
   await setDoc(userRef, {
     name
   }, { merge: true });
+};
+
+export const deleteClientCompletely = async (userId) => {
+  try {
+    const functions = getFunctions();
+    const deleteUserFunction = httpsCallable(functions, 'deleteUser');
+    
+    const result = await deleteUserFunction({ userId });
+    
+    if (result.data.success) {
+      return { success: true };
+    } else {
+      throw new Error('Failed to delete user');
+    }
+  } catch (error) {
+    console.error('Error deleting client:', error);
+    throw error;
+  }
 };
