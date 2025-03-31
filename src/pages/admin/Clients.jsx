@@ -21,9 +21,26 @@ const Clients = () => {
     password: ''
   });
 
+  // Store admin credentials before creating new client
+  const [adminCredentials, setAdminCredentials] = useState(null);
+
   // Load clients
   useEffect(() => {
     loadClients();
+  }, []);
+
+  useEffect(() => {
+    // Store admin credentials when component mounts
+    const storeAdminCredentials = async () => {
+      const auth = getAuth();
+      if (auth.currentUser) {
+        setAdminCredentials({
+          email: auth.currentUser.email,
+          uid: auth.currentUser.uid
+        });
+      }
+    };
+    storeAdminCredentials();
   }, []);
 
   const loadClients = async () => {
@@ -45,7 +62,13 @@ const Clients = () => {
     e.preventDefault();
     try {
       const auth = getAuth();
+      const currentAdmin = auth.currentUser;
       
+      if (!currentAdmin) {
+        setError('Admin authentication required');
+        return;
+      }
+
       // Check if user already exists in Firestore
       const usersRef = collection(db, 'users');
       const q = query(usersRef, where('email', '==', formData.email));
@@ -71,6 +94,9 @@ const Clients = () => {
         status: 'active',
         uid: userCredential.user.uid
       });
+
+      // Force a reload of the current user to maintain admin session
+      await auth.currentUser.reload();
       
       setClients(prev => [...prev, { id: userCredential.user.uid, ...formData }]);
       setShowAddModal(false);
