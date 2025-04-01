@@ -144,6 +144,11 @@ const Clients = () => {
     try {
       console.log('Loading admins...');
       
+      // Get current user first
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      console.log('Current user ID:', currentUser?.uid);
+      
       // Query specifically for admins
       const adminsQuery = query(
         collection(db, 'users'),
@@ -153,10 +158,15 @@ const Clients = () => {
       const querySnapshot = await getDocs(adminsQuery);
       console.log('Admins query snapshot size:', querySnapshot.size);
       
-      const adminsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const adminsData = querySnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(admin => {
+          console.log('Comparing admin ID:', admin.id, 'with current user ID:', currentUser?.uid);
+          return admin.id !== currentUser?.uid;
+        });
       
       console.log('Final admins data:', adminsData);
       setAdmins(adminsData);

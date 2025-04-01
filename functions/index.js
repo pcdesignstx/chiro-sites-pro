@@ -94,7 +94,7 @@ exports.createAdmin = onCall({
   timeoutSeconds: 60
 }, async (request) => {
   try {
-    // Verify the caller is an owner
+    // Verify the caller is an admin
     if (!request.auth) {
       throw new Error('Must be logged in');
     }
@@ -102,8 +102,8 @@ exports.createAdmin = onCall({
     const callerUid = request.auth.uid;
     const callerDoc = await admin.firestore().collection('users').doc(callerUid).get();
     
-    if (!callerDoc.exists || callerDoc.data().role !== 'owner') {
-      throw new Error('Must be an owner to create admins');
+    if (!callerDoc.exists || callerDoc.data().role !== 'admin') {
+      throw new Error('Must be an admin to create other admins');
     }
 
     // Create the user in Authentication
