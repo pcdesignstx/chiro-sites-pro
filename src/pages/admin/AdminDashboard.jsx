@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../../firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { isAdmin, isAccountManager } from '../../utils/userManagement';
+import { useNavigate } from 'react-router-dom';
 import {
   ClipboardDocumentListIcon,
   UsersIcon,
@@ -16,6 +19,20 @@ const AdminDashboard = () => {
   const [recentRequests, setRecentRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadUserRole = async () => {
+      const auth = getAuth();
+      if (auth.currentUser) {
+        const isAdminUser = await isAdmin(auth.currentUser.uid);
+        const isAccountManagerUser = await isAccountManager(auth.currentUser.uid);
+        setUserRole(isAdminUser ? 'admin' : isAccountManagerUser ? 'accountManager' : 'client');
+      }
+    };
+    loadUserRole();
+  }, []);
 
   useEffect(() => {
     const loadRecentRequests = async () => {
@@ -65,9 +82,75 @@ const AdminDashboard = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Admin Dashboard</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+      
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900">Total Clients</h3>
+          <p className="text-3xl font-bold text-teal-500">--</p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900">Active Clients</h3>
+          <p className="text-3xl font-bold text-green-500">--</p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900">Inactive Clients</h3>
+          <p className="text-3xl font-bold text-red-500">--</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="space-y-4">
+            {userRole === 'admin' && (
+              <button
+                onClick={() => navigate('/admin/clients/new')}
+                className="w-full px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
+              >
+                Add New Client
+              </button>
+            )}
+            <button
+              onClick={() => navigate('/admin/clients')}
+              className="w-full px-4 py-2 bg-gray-100 text-gray-900 rounded hover:bg-gray-200"
+            >
+              View All Clients
+            </button>
+            {userRole === 'admin' && (
+              <button
+                onClick={() => navigate('/admin/settings')}
+                className="w-full px-4 py-2 bg-gray-100 text-gray-900 rounded hover:bg-gray-200"
+              >
+                System Settings
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
+          <div className="space-y-4">
+            <p className="text-gray-600">No recent activity to display</p>
+          </div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Quick Stats Cards */}

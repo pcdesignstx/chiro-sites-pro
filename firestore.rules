@@ -7,8 +7,9 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+    function isOwner() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner';
     }
     
     function isAdmin() {
@@ -25,38 +26,49 @@ service cloud.firestore {
 
     // User document rules
     match /users/{userId} {
-      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      allow write: if isAuthenticated() && isAdmin();
-      allow list: if isAuthenticated() && isAdmin();
+      allow read: if isAuthenticated() && (isOwner() || isAdmin());
+      allow create: if isAuthenticated() && (
+        isOwner() || 
+        (isAdmin() && request.resource.data.role != 'owner')
+      );
+      allow update: if isAuthenticated() && (
+        isOwner() || 
+        (isAdmin() && resource.data.role != 'owner' && request.resource.data.role != 'owner')
+      );
+      allow delete: if isAuthenticated() && (
+        isOwner() || 
+        (isAdmin() && resource.data.role != 'owner')
+      );
+      allow list: if isAuthenticated() && (isOwner() || isAdmin());
       
       // Settings subcollection rules
       match /settings/{document=**} {
-        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
-        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow read: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
       }
       
       // Elements subcollection rules
       match /elements/{document=**} {
-        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
-        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow read: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
       }
       
       // Pages subcollection rules
       match /pages/{document=**} {
-        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
-        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow read: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
       }
       
       // Blog subcollection rules
       match /blog/{document=**} {
-        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
-        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow read: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
       }
       
       // Landing pages subcollection rules
       match /landingPages/{document=**} {
-        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
-        allow write: if isAuthenticated() && (isOwner(userId) || isAdmin() || isClient());
+        allow read: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
+        allow write: if isAuthenticated() && (isOwner() || isAdmin() || isClient());
       }
     }
 

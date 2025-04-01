@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'react-hot-toast';
 import MainLayout from './components/MainLayout';
 import AdminLayout from './components/AdminLayout';
 import Sidebar from './components/Sidebar';
@@ -37,6 +36,7 @@ export default function App() {
   return (
     <AuthProvider>
       <FormDataProvider>
+        <Toaster position="top-right" />
         <Router>
           <Routes>
             {/* Public Routes */}
@@ -89,7 +89,6 @@ export default function App() {
               }
             />
           </Routes>
-          <ToastContainer />
         </Router>
       </FormDataProvider>
     </AuthProvider>

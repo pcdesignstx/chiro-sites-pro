@@ -1,6 +1,6 @@
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
-  { name: 'Clients', href: '/admin/clients', icon: UserGroupIcon },
+  { name: 'Account Management', href: '/admin/clients', icon: UserGroupIcon },
   { name: 'Organizations', href: '/admin/organizations', icon: BuildingOfficeIcon },
   { name: 'Admin Users', href: '/admin/users', icon: UserIcon },
   { name: 'Content', href: '/admin/content', icon: DocumentTextIcon },

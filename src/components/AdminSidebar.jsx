@@ -34,7 +34,7 @@ const AdminSidebar = () => {
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: HomeIcon },
     { name: 'Client Dashboard', href: '/dashboard', icon: ArrowTopRightOnSquareIcon },
-    { name: 'Clients', href: '/admin/clients', icon: UsersIcon },
+    { name: 'Account Management', href: '/admin/clients', icon: UsersIcon },
     { name: 'Requests', href: '/admin/requests', icon: ClipboardDocumentListIcon },
     { name: 'Content Export', href: '/admin/content-export', icon: ArrowDownTrayIcon },
     { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },

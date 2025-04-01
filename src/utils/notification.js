@@ -1,29 +1,49 @@
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 
 export const showNotification = (message, type = 'success') => {
-  const options = {
-    position: 'top-right',
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-  };
-
   switch (type) {
     case 'success':
-      toast.success(message, options);
+      toast.success(message);
       break;
     case 'error':
-      toast.error(message, options);
+      toast.error(message);
       break;
     case 'warning':
-      toast.warning(message, options);
+      toast(message, {
+        icon: '⚠️',
+        style: {
+          background: '#FEF3C7',
+          color: '#92400E',
+        },
+      });
       break;
     case 'info':
-      toast.info(message, options);
+      toast(message);
       break;
     default:
-      toast(message, options);
+      toast(message);
   }
+};
+
+// New convenience functions
+export const showSuccess = (message) => {
+  toast.success(message);
+};
+
+export const showError = (message) => {
+  toast.error(message);
+};
+
+export const showInfo = (message) => {
+  toast(message);
+};
+
+export const showWarning = (message) => {
+  toast(message, {
+    icon: '⚠️',
+    style: {
+      background: '#FEF3C7',
+      color: '#92400E',
+    },
+  });
 }; 
