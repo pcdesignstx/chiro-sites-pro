@@ -75,7 +75,7 @@ const Login = () => {
     <div className="min-h-screen bg-teal-600 flex flex-col items-center justify-center p-4">
       {/* Logo */}
       <div className="mb-8">
-        <img src={logo} alt="Swyft Logo" className="h-16 w-auto" />
+        <img src={logo} alt="Swyft Logo" className="h-24 w-auto" />
       </div>
 
       {/* Login Card */}

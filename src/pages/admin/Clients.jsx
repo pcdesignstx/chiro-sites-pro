@@ -18,6 +18,8 @@ const Clients = () => {
   const [showAddAdminModal, setShowAddAdminModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [isCreatingClient, setIsCreatingClient] = useState(false);
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -188,6 +190,7 @@ const Clients = () => {
       }
 
       setError(null);
+      setIsCreatingClient(true);
       console.log('Creating new client with data:', formData);
 
       // Create client using Cloud Function
@@ -198,17 +201,20 @@ const Clients = () => {
       await loadClients();
       
       setShowAddModal(false);
-      setFormData({ name: '', email: '', clinicName: '', status: 'active', password: '' });
-
-      // Show success message
-      const successMessage = document.createElement('div');
-      successMessage.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
-      successMessage.textContent = 'Client added successfully!';
-      document.body.appendChild(successMessage);
-      setTimeout(() => successMessage.remove(), 3000);
+      setFormData({
+        name: '',
+        email: '',
+        clinicName: '',
+        status: 'active',
+        password: ''
+      });
+      toast.success('Client created successfully');
     } catch (error) {
-      console.error('Error adding client:', error);
-      setError(error.message || 'Failed to add client. Please try again.');
+      console.error('Error creating client:', error);
+      setError(error.message || 'Failed to create client');
+      toast.error('Failed to create client');
+    } finally {
+      setIsCreatingClient(false);
     }
   };
 
@@ -279,22 +285,29 @@ const Clients = () => {
       }
 
       setError(null);
+      setIsCreatingAdmin(true);
       console.log('Creating new admin with data:', adminFormData);
 
       // Create admin using Cloud Function
       const result = await createAdmin(adminFormData);
       console.log('Admin created successfully:', result);
 
-      // Reload both lists
-      await Promise.all([loadClients(), loadAdmins()]);
+      // Reload the clients list
+      await loadClients();
       
       setShowAddAdminModal(false);
-      setAdminFormData({ name: '', email: '', password: '' });
-
-      toast.success('Admin added successfully!');
+      setAdminFormData({
+        name: '',
+        email: '',
+        password: '',
+      });
+      toast.success('Admin created successfully');
     } catch (error) {
-      console.error('Error adding admin:', error);
-      toast.error(error.message || 'Failed to add admin');
+      console.error('Error creating admin:', error);
+      setError(error.message || 'Failed to create admin');
+      toast.error('Failed to create admin');
+    } finally {
+      setIsCreatingAdmin(false);
     }
   };
 
@@ -532,9 +545,12 @@ const Clients = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
+                  disabled={isCreatingAdmin}
+                  className={`px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 ${
+                    isCreatingAdmin ? 'cursor-not-allowed bg-gray-400' : ''
+                  }`}
                 >
-                  Add Admin
+                  {isCreatingAdmin ? 'Creating Admin...' : 'Create Admin'}
                 </button>
               </div>
             </form>
@@ -611,9 +627,12 @@ const Clients = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
+                    disabled={isCreatingClient}
+                    className={`px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 ${
+                      isCreatingClient ? 'cursor-not-allowed bg-gray-400' : ''
+                    }`}
                   >
-                    Add Client
+                    {isCreatingClient ? 'Creating Client...' : 'Create Client'}
                   </button>
                 </div>
               </form>
